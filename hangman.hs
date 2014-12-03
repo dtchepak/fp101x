@@ -38,9 +38,9 @@ diff :: String -> String -> String
 diff a b = map (\c -> if c `elem` b then c else '_') a
 
 foldLeftM :: Monad m => (a -> b -> m a) -> a -> [b] -> m a
-foldLeftM f acc =
+foldLeftM f =
     let f' a b = a >>= \a' -> f a' b
-    in foldl f' (return acc) 
+    in foldl f' . return
 {-
 foldLeftM _ acc [] = return acc
 foldLeftM f acc (b:bs) =
@@ -48,6 +48,5 @@ foldLeftM f acc (b:bs) =
 -}
 
 foldRightM :: Monad m => (a -> b -> m b) -> b -> [a] -> m b
-foldRightM f acc =
-    let f' a b = b >>= f a
-    in foldr f' (return acc)
+foldRightM f =
+    foldr ((=<<) . f) . return
