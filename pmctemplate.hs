@@ -61,10 +61,15 @@ bindC ::
 bindC f g = \b -> f (\a -> g a b)
     -- f . flip g
 
+getC :: Concurrent a -> ((a -> Action) -> Action)
+getC (Concurrent c) = c
+
 instance Monad Concurrent where
     -- :: Concurrent a -> (a -> Concurrent b) -> Concurrent b
     (Concurrent f) >>= g =
-        Concurrent $ bindC f (\a -> let (Concurrent b) = g a in b)
+        Concurrent $ \b -> f (\a -> getC (g a) b)
+
+--        Concurrent $ bindC f (\a -> let (Concurrent b) = g a in b)
 
     return x = Concurrent (\c -> c x)
 
